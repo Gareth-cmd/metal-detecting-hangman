@@ -341,4 +341,34 @@
       const guess = fullGuessInput.value.trim().toLowerCase();
       if (!guess) return;
       // Convert chosenWord's spaces to "/" for the full answer
-      const correctFull
+      const correctFullAnswer = chosenWord.replace(/ /g, "/");
+      if (guess === correctFullAnswer) {
+        displayWord = chosenWord.split("").map(letter => letter === " " ? "/" : letter);
+        updateWordDisplay();
+        messageDiv.style.color = "#388e3c";
+        messageDiv.textContent = "Congratulations! You guessed it!";
+        disableAllButtons();
+      } else {
+        wrongGuesses++;
+        drawHangman();
+        checkLose();
+        messageDiv.style.color = "#d32f2f";
+        messageDiv.textContent = "Wrong guess!";
+      }
+      fullGuessInput.value = "";
+    });
+
+    // Reset button listener
+    resetBtn.addEventListener("click", initGame);
+
+    // Resize canvas when the window is resized
+    window.addEventListener("resize", resizeCanvas);
+
+    // Start the game when the page loads
+    window.onload = () => {
+      initGame();
+      resizeCanvas();
+    };
+  </script>
+</body>
+</html>
