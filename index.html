@@ -5,65 +5,91 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Metal Detecting Hangman</title>
   <style>
+    /* Dark Mode Theme */
     body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      background-color: #f0f8ff;
+      font-family: 'Arial', sans-serif; /* More readable font */
+      background-color: #1e1e1e; /* Dark background */
+      color: #d4d4d4; /* Light text */
       margin: 0;
       padding: 20px;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh; /* Ensure full viewport height */
+      box-sizing: border-box; /* Include padding in width calculation */
     }
+
     h1 {
-      color: #333;
+      color: #f0f0f0; /* Lighter header color */
     }
+
     #gameContainer {
-      width: 90%;
-      max-width: 800px;
-      margin: 0 auto;
-      background: #fff;
+      width: 95%; /* Wider container */
+      max-width: 600px; /* Smaller max-width for better mobile experience */
+      margin: auto;
+      background: #252525; /* Darker container background */
       border-radius: 10px;
       padding: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
+
     #hangmanCanvas {
-      background-color: #e0f7fa;
-      border: 2px solid #333;
+      background-color: #303030; /* Darker canvas background */
+      border: 2px solid #f0f0f0; /* White border */
       border-radius: 5px;
       margin-bottom: 20px;
-      /* The canvas element will adjust its displayed size; its internal drawing size is controlled by JavaScript */
       width: 100%;
       height: auto;
     }
+
     #wordDisplay {
       font-size: 2em;
       letter-spacing: 10px;
       margin: 20px 0;
+      color: #f0f0f0; /* Light word color */
     }
+
     #letterButtons button {
       margin: 5px;
       padding: 10px 15px;
       font-size: 1em;
       border: none;
       border-radius: 5px;
-      background-color: #4caf50;
-      color: white;
+      background-color: #ffd700; /* Yellow letters */
+      color: #1e1e1e; /* Dark text */
       cursor: pointer;
       transition: background-color 0.3s;
     }
+
+    #letterButtons button:hover {
+      background-color: #e6c300; /* Darker yellow on hover */
+    }
+    
     #letterButtons button:disabled {
-      background-color: #9e9e9e;
+      background-color: #666; /* Darker disabled button color */
+      color: #ccc;
       cursor: not-allowed;
     }
+
     #guessSection {
       margin: 20px 0;
     }
+
     #guessSection input[type="text"] {
       padding: 10px;
       font-size: 1em;
-      border: 2px solid #333;
+      border: 2px solid #f0f0f0;
       border-radius: 5px;
-      width: 200px;
-      margin-right: 10px;
+      width: calc(60% - 22px);
+      max-width: 300px; /* Adjust input width */
+      background-color: #303030;
+      color: #f0f0f0;
     }
+
     #guessSection button {
       padding: 10px 15px;
       font-size: 1em;
@@ -73,10 +99,16 @@
       color: white;
       cursor: pointer;
     }
+
+    #guessSection button:hover {
+      background-color: #e68a00;
+    }
+
     #message {
       font-size: 1.5em;
       margin: 20px 0;
     }
+
     #resetBtn {
       padding: 10px 15px;
       font-size: 1em;
@@ -85,6 +117,9 @@
       background-color: #2196f3;
       color: white;
       cursor: pointer;
+    }
+    #resetBtn:hover {
+        background-color: #1976d2;
     }
   </style>
 </head>
@@ -101,7 +136,7 @@
     <div id="message"></div>
     <button id="resetBtn">Reset Game</button>
   </div>
-  
+
   <script>
     // List of metal detecting finds (with "war button" removed, 15 additional items added)
     const words = [
@@ -116,7 +151,7 @@
     let displayWord = [];
     let wrongGuesses = 0;
     const maxWrong = 10;
-    
+
     const canvas = document.getElementById("hangmanCanvas");
     const ctx = canvas.getContext("2d");
     const wordDisplay = document.getElementById("wordDisplay");
@@ -135,30 +170,30 @@
       canvas.height = canvas.width;
       drawHangman(); // Redraw current hangman
     }
-    
+
     // Initialize or reset the game
     function initGame() {
       wrongGuesses = 0;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       messageDiv.textContent = "";
       fullGuessInput.value = "";
-      
+
       // Pick a random word from the list
       chosenWord = words[Math.floor(Math.random() * words.length)].toLowerCase();
-      
+
       // Set up display word; replace spaces with "/" for two-word answers
-      displayWord = chosenWord.split("").map(letter => letter === " " ? "/" : "_" );
-      
+      displayWord = chosenWord.split("").map(letter => letter === " " ? "/" : "_");
+
       updateWordDisplay();
       createLetterButtons();
       drawHangman();
     }
-    
+
     // Update the on-screen word display
     function updateWordDisplay() {
       wordDisplay.textContent = displayWord.join(" ");
     }
-    
+
     // Create clickable letter buttons for A-Z
     function createLetterButtons() {
       letterButtonsDiv.innerHTML = "";
@@ -170,7 +205,7 @@
         letterButtonsDiv.appendChild(btn);
       }
     }
-    
+
     // Handle letter button clicks
     function handleLetter(letter, btn) {
       btn.disabled = true;
@@ -189,7 +224,7 @@
         checkLose();
       }
     }
-    
+
     // Check if the player has won
     function checkWin() {
       if (!displayWord.includes("_")) {
@@ -198,7 +233,7 @@
         disableAllButtons();
       }
     }
-    
+
     // Check if the player has lost
     function checkLose() {
       if (wrongGuesses >= maxWrong) {
@@ -208,28 +243,28 @@
         disableAllButtons();
       }
     }
-    
+
     // Reveal the full word
     function revealWord() {
       displayWord = chosenWord.split("").map(letter => letter === " " ? "/" : letter);
       updateWordDisplay();
     }
-    
+
     // Disable all letter buttons
     function disableAllButtons() {
       const buttons = document.querySelectorAll("#letterButtons button");
       buttons.forEach(btn => btn.disabled = true);
     }
-    
+
     // Draw the hangman progressively based on wrongGuesses (10 stages)
     function drawHangman() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = "#333";
+      ctx.strokeStyle = "#f0f0f0"; /* White lines */
       ctx.lineWidth = 4;
-      
+
       // Calculate scaling factor based on canvas width (assumes base width ~300)
       const scale = canvas.width / 300;
-      
+
       // Stage 1: Base
       if (wrongGuesses > 0) {
         ctx.beginPath();
@@ -300,40 +335,10 @@
         ctx.stroke();
       }
     }
-    
+
     // Full-word guess handler
     document.getElementById("fullGuessBtn").addEventListener("click", () => {
       const guess = fullGuessInput.value.trim().toLowerCase();
       if (!guess) return;
       // Convert chosenWord's spaces to "/" for the full answer
-      const correctFullAnswer = chosenWord.replace(/ /g, "/");
-      if (guess === correctFullAnswer) {
-        displayWord = chosenWord.split("").map(letter => letter === " " ? "/" : letter);
-        updateWordDisplay();
-        messageDiv.style.color = "#388e3c";
-        messageDiv.textContent = "Congratulations! You guessed it!";
-        disableAllButtons();
-      } else {
-        wrongGuesses++;
-        drawHangman();
-        checkLose();
-        messageDiv.style.color = "#d32f2f";
-        messageDiv.textContent = "Wrong guess!";
-      }
-      fullGuessInput.value = "";
-    });
-    
-    // Reset button listener
-    resetBtn.addEventListener("click", initGame);
-    
-    // Resize canvas when the window is resized
-    window.addEventListener("resize", resizeCanvas);
-    
-    // Start the game when the page loads
-    window.onload = () => {
-      initGame();
-      resizeCanvas();
-    };
-  </script>
-</body>
-</html>
+      const correctFull
